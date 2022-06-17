@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using brokenaccesscontrol.Models;
+using brokenaccesscontrol.Repositories;
 
 namespace brokenaccesscontrol.Controllers;
 
@@ -19,9 +20,11 @@ public class UserController : ControllerBase
     public async Task<ActionResult<dynamic>> Register([FromBody]UserRequest userRequest)
     {
 
+        var user = UserRepository.Insert(userRequest);
+
         return new {
-            user = userRequest,
-            message = "success"
+            user = user,
+            message = user == null ? "Error" : "Success"
         };
     }    
 
