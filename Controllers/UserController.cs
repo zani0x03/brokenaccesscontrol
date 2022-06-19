@@ -17,15 +17,22 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<dynamic>> Register([FromBody]UserRequest userRequest)
+    public async Task<dynamic> Register([FromBody]UserRequest userRequest)
     {
 
-        var user = UserRepository.Insert(userRequest);
+        var user = await UserRepository.Insert(userRequest);
 
         return new {
             user = user,
             message = user == null ? "Error" : "Success"
         };
     }    
+
+    [HttpGet]
+    public async Task<IEnumerable<User>> GetAllUsers()
+    {
+        return await UserRepository.GetAllUsers();
+    }
+
 
 }

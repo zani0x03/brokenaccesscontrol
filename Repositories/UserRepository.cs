@@ -2,13 +2,14 @@ using Dapper;
 using brokenaccesscontrol.Models;
 using System.Security.Cryptography;
 using System.Text;
+using brokenaccesscontrol.Services;
 
 namespace brokenaccesscontrol.Repositories;
 
 public static class UserRepository
 {
 
-    public static UserRequestReturn Insert(UserRequest userRequest){
+    public static async Task<UserRequestReturn> Insert(UserRequest userRequest){
 
         var userRequestReturn = new UserRequestReturn {
             Id = Guid.NewGuid().ToString(),
@@ -16,13 +17,13 @@ public static class UserRepository
             IsAdmin = userRequest.IsAdmin.HasValue ? userRequest.IsAdmin.Value : false,
             Login = userRequest.Login,
             Name = userRequest.Name,
-            Password = Convert.ToBase64String((SHA512.Create()).ComputeHash(Encoding.UTF8.GetBytes(userRequest.Password)))
+            Password = UtilService.ReturnSha512(userRequest.Password)
         };
 
         try{
             var conn = SqliteConfigConnection.GetSQLiteConnection(); 
             var query = "insert into users (id,name,login, password,isAdmin,dateInsert) values(@id,@name,@login,@password,@isAdmin,@dateInsert)";
-            var table = conn.Execute(query, new{
+            var table = await conn.ExecuteAsync(query, new{
                 id = userRequestReturn.Id,
                 name = userRequestReturn.Name,
                 login = userRequestReturn.Login,
@@ -38,6 +39,14 @@ public static class UserRepository
 
         return userRequestReturn;        
     }
+
+    public static async Task<IEnumerable<User>> GetAllUsers()
+    {
+        var conn = SqliteConfigConnection.GetSQLiteConnection();
+        string query = "Select id, name, login, password, dateInsert, dateUpdate, isAdmin from users";
+        var lstUsers = await conn.QueryAsync<User>(query);
+        return lstUsers;
+    }       
 
     // public static bool UserExist(string login){
     //     try{

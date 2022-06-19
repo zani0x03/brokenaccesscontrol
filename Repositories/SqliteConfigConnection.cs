@@ -8,7 +8,7 @@ public static class SqliteConfigConnection
 
     public static SqliteConnection GetSQLiteConnection(){        
         if (sqliteConn == null){
-            sqliteConn = new SqliteConnection("Data Source=/home/zani0x03/examples/brokenaccesscontrol/Database/brokenaccesscontrol.db");
+            sqliteConn = new SqliteConnection($"Data Source={Environment.GetEnvironmentVariable("SqliteDatabase")}");
             sqliteConn.Open();
         }
         return sqliteConn;
