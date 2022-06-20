@@ -1,7 +1,5 @@
 using Dapper;
 using brokenaccesscontrol.Models;
-using System.Security.Cryptography;
-using System.Text;
 using brokenaccesscontrol.Services;
 
 namespace brokenaccesscontrol.Repositories;
@@ -9,51 +7,60 @@ namespace brokenaccesscontrol.Repositories;
 public static class UserRepository
 {
 
-    public static async Task<UserRequestReturn> Insert(UserRequest userRequest){
+    public static async Task<UserResponse> Insert(UserRequest userRequest){
 
-        var userRequestReturn = new UserRequestReturn {
-            Id = Guid.NewGuid().ToString(),
-            DateInsert = DateTime.UtcNow,
-            IsAdmin = userRequest.IsAdmin.HasValue ? userRequest.IsAdmin.Value : false,
-            Login = userRequest.Login,
-            Name = userRequest.Name,
-            Password = UtilService.ReturnSha512(userRequest.Password)
-        };
+        var userResponse = new UserResponse {
+                User = new Models.User{
+                Id = Guid.NewGuid().ToString(),
+                DateInsert = DateTime.UtcNow,
+                IsAdmin = userRequest.IsAdmin.HasValue ? userRequest.IsAdmin.Value : false,
+                Login = userRequest.Login,
+                Name = userRequest.Name,
+                Password = UtilService.ReturnSha512(userRequest.Password)             
+            }
+        };          
 
-        try{
-            var conn = SqliteConfigConnection.GetSQLiteConnection(); 
-            var query = "insert into users (id,name,login, password,isAdmin,dateInsert) values(@id,@name,@login,@password,@isAdmin,@dateInsert)";
-            var table = await conn.ExecuteAsync(query, new{
-                id = userRequestReturn.Id,
-                name = userRequestReturn.Name,
-                login = userRequestReturn.Login,
-                password = userRequestReturn.Password,
-                isAdmin = userRequestReturn.IsAdmin,
-                dateInsert = userRequestReturn.DateInsert.ToString("yyyy-MM-dd HH:mm:ss")
-            });        
-        }catch(Exception ex){
-            userRequestReturn.Id = "";
-            userRequestReturn.Password = "";
-            userRequestReturn.Message = $"Erro: {ex.Message}";
-        }
+        var conn = SqliteConfigConnection.GetSQLiteConnection(); 
+        var query = "insert into users (id,name,login, password,isAdmin,dateInsert) values(@id,@name,@login,@password,@isAdmin,@dateInsert)";
+        var table = await conn.ExecuteAsync(query, new{
+            id = userResponse.User.Id,
+            name = userResponse.User.Name,
+            login = userResponse.User.Login,
+            password = userResponse.User.Password,
+            isAdmin = userResponse.User.IsAdmin,
+            dateInsert = userResponse.User.DateInsert.ToString("yyyy-MM-dd HH:mm:ss")
+        });        
 
-        return userRequestReturn;        
+
+        return userResponse;        
     }
 
     public static async Task<IEnumerable<User>> GetAllUsers()
     {
-        var conn = SqliteConfigConnection.GetSQLiteConnection();
-        string query = "Select id, name, login, password, dateInsert, dateUpdate, isAdmin from users";
-        var lstUsers = await conn.QueryAsync<User>(query);
-        return lstUsers;
+            var conn = SqliteConfigConnection.GetSQLiteConnection();
+            string query = "Select id, name, login, password, dateInsert, dateUpdate, isAdmin from users";
+            var lstUsers = await conn.QueryAsync<User>(query);
+            return lstUsers;
     }       
 
-    // public static bool UserExist(string login){
-    //     try{
-    //         var conn = SqliteConfigConnection.GetSQLiteConnection();
-    //         var query = "select count(*) from users where login = @login";
-    //     }catch(Exception ex){
 
-    //     }
-    // }
+    public static async Task<User> Login(LoginRequest login)
+    {
+        var conn = SqliteConfigConnection.GetSQLiteConnection();
+        string query = "Select id, name, login, password, dateInsert, dateUpdate, isAdmin from users where login = @login";
+        var user = await conn.QueryAsync<User>(query, new{
+            @login = login.Login
+        });
+        return user.FirstOrDefault();
+    }  
+
+    public static async Task<bool> LoginExist(string login)
+    {
+        var conn = SqliteConfigConnection.GetSQLiteConnection();
+        string query = "Select count(*) from users where login = @login";
+        var user = await conn.QueryAsync<int>(query, new{
+            @login = login
+        });
+        return user.FirstOrDefault() > 0 ? true : false;
+    }  
 }

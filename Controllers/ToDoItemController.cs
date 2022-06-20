@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using brokenaccesscontrol.Models;
 using brokenaccesscontrol.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -24,19 +26,28 @@ public class ToDoItemController : ControllerBase
         return await TodoItemRepository.GetToDoItems();
     }
 
-    // // GET: api/ToDoItem/5
+    // // // GET: api/ToDoItem/5
     // [HttpGet("{id}")]
-    // public async Task<ActionResult<ToDoItemModel>> GetToDoItemModel(int id)
+    // [Authorize(Roles = "admin")]
+    // public async Task<dynamic> GetToDoItemModel(int id)
     // {
-    //     var toDoItemModel = await _context.ToDoItems.FindAsync(id);
+    //     // var toDoItemModel = await _context.ToDoItems.FindAsync(id);
 
-    //     if (toDoItemModel == null)
-    //     {
-    //         return NotFound();
-    //     }
+    //     // if (toDoItemModel == null)
+    //     // {
+    //     //     return NotFound();
+    //     // }
 
-    //     return toDoItemModel;
+    //     return new {
+    //         Id = "asdfasdf",
+    //         Name = "asdfasdf",
+    //         Description = "asdfasdf",
+    //         Teste = ((ClaimsIdentity)User.Identity).FindFirst("UserId").Value
+    //     };
     // }
+
+
+
 
     // // PUT: api/ToDoItem/5
     // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

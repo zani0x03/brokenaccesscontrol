@@ -17,15 +17,33 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<dynamic> Register([FromBody]UserRequest userRequest)
+    public async Task<ActionResult> Register([FromBody]UserRequest userRequest)
     {
 
-        var user = await UserRepository.Insert(userRequest);
+        try{
+            
+            if (await UserRepository.LoginExist(userRequest.Login))
+                return Conflict(
+                    new {
+                        user = userRequest,
+                        message = "User exist!!"
+                    }
+                );
 
-        return new {
-            user = user,
-            message = user == null ? "Error" : "Success"
-        };
+            var user = await UserRepository.Insert(userRequest);
+
+            return Ok(new
+            {
+                user = user,
+                message = user == null ? "Error" : "Success"
+            });                     
+
+        }catch(Exception ex){
+            _logger.LogError(ex, "General error");
+            return StatusCode(500, "Internal server error");            
+        }
+
+
     }    
 
     [HttpGet]

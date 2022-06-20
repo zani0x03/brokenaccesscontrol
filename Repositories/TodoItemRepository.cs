@@ -14,6 +14,5 @@ public static class TodoItemRepository
         string query = "Select id, name, description from todoitems";
         var lstTodoItens = await conn.QueryAsync<TodoItem>(query);
         return lstTodoItens;
-    }    
-
+    }
 }
