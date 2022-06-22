@@ -26,89 +26,68 @@ public class ToDoItemController : ControllerBase
         return await TodoItemRepository.GetToDoItems();
     }
 
-    // // // GET: api/ToDoItem/5
-    // [HttpGet("{id}")]
-    // [Authorize(Roles = "admin")]
-    // public async Task<dynamic> GetToDoItemModel(int id)
-    // {
-    //     // var toDoItemModel = await _context.ToDoItems.FindAsync(id);
+    [Authorize]
+    [HttpPost]
+    public async Task<ActionResult> Post(TodoItemNewRequest todoItem)
+    {
+        try{
+            var ret = await TodoItemRepository.Insert(todoItem, ((ClaimsIdentity)User.Identity).FindFirst("UserId").Value);
 
-    //     // if (toDoItemModel == null)
-    //     // {
-    //     //     return NotFound();
-    //     // }
+            if (ret)
+                return Ok(new
+                {
+                    todoItem = todoItem,
+                    message = "Success"
+                });                     
+            else
+                throw new Exception("Error contact the system admin!!");
 
-    //     return new {
-    //         Id = "asdfasdf",
-    //         Name = "asdfasdf",
-    //         Description = "asdfasdf",
-    //         Teste = ((ClaimsIdentity)User.Identity).FindFirst("UserId").Value
-    //     };
-    // }
+        }catch(Exception ex){
+            _logger.LogError(ex, "General error");
+            return StatusCode(500, "Internal server error");            
+        }        
+    }
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult> GetToDoItem(int id)
+    {
+        try{
+            var todoItem = await TodoItemRepository.GetToDoItem(id);
 
+            if (todoItem != null)
+                return Ok(new
+                {
+                    todoItem
+                });                     
+            else
+                return NotFound(new{
+                    message = "TodoItem not found!!"
+                });
 
+        }catch(Exception ex){
+            _logger.LogError(ex, "General error");
+            return StatusCode(500, "Internal server error");            
+        }     
+    }    
 
-    // // PUT: api/ToDoItem/5
-    // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    // [HttpPut("{id}")]
-    // public async Task<IActionResult> PutToDoItemModel(int id, ToDoItemModel toDoItemModel)
-    // {
-    //     if (id != toDoItemModel.ItemId)
-    //     {
-    //         return BadRequest();
-    //     }
+    [Authorize]
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(int id)
+    {
+        try{
+            var ret = await TodoItemRepository.Delete(id);
 
-    //     _context.Entry(toDoItemModel).State = EntityState.Modified;
+            if (ret)
+                return Ok(new
+                {
+                    message = "Removed!"
+                });                     
+            else
+                throw new Exception("Error contact the system admin!!");
 
-    //     try
-    //     {
-    //         await _context.SaveChangesAsync();
-    //     }
-    //     catch (DbUpdateConcurrencyException)
-    //     {
-    //         if (!ToDoItemModelExists(id))
-    //         {
-    //             return NotFound();
-    //         }
-    //         else
-    //         {
-    //             throw;
-    //         }
-    //     }
-
-    //     return NoContent();
-    // }
-
-    // // POST: api/ToDoItem
-    // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    // [HttpPost]
-    // public async Task<ActionResult<ToDoItemModel>> PostToDoItemModel(ToDoItemModel toDoItemModel)
-    // {
-    //     _context.ToDoItems.Add(toDoItemModel);
-    //     await _context.SaveChangesAsync();
-
-    //     return CreatedAtAction("GetToDoItemModel", new { id = toDoItemModel.ItemId }, toDoItemModel);
-    // }
-
-    // // DELETE: api/ToDoItem/5
-    // [HttpDelete("{id}")]
-    // public async Task<IActionResult> DeleteToDoItemModel(int id)
-    // {
-    //     var toDoItemModel = await _context.ToDoItems.FindAsync(id);
-    //     if (toDoItemModel == null)
-    //     {
-    //         return NotFound();
-    //     }
-
-    //     _context.ToDoItems.Remove(toDoItemModel);
-    //     await _context.SaveChangesAsync();
-
-    //     return NoContent();
-    // }
-
-    // private bool ToDoItemModelExists(int id)
-    // {
-    //     return _context.ToDoItems.Any(e => e.ItemId == id);
-    // }  
+        }catch(Exception ex){
+            _logger.LogError(ex, "General error");
+            return StatusCode(500, "Internal server error");            
+        }        
+    }
 }

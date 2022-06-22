@@ -11,7 +11,7 @@ public static class TodoItemRepository
     public static async Task<IEnumerable<TodoItem>> GetToDoItems()
     {
         var conn = SqliteConfigConnection.GetSQLiteConnection();
-        string query = "Select id, name, description from todoitems";
+        string query = "Select id, name, description, userId from todoitems";
         var lstTodoItens = await conn.QueryAsync<TodoItem>(query);
         return lstTodoItens;
     }
@@ -19,7 +19,7 @@ public static class TodoItemRepository
     public static async Task<TodoItem> GetToDoItem(int id)
     {
         var conn = SqliteConfigConnection.GetSQLiteConnection();
-        string query = "Select id, name, description from todoitems where id = @id";
+        string query = "Select id, name, description, userId from todoitems where id = @id";
         var todoItem = await conn.QueryAsync<TodoItem>(query, new{
             id = id
         });
