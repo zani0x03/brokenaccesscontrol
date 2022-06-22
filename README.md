@@ -9,6 +9,8 @@ Dentro da pasta Properties tem um arquivo launchSettings.json, nele precisa alte
 - Tirando as chamadas base todas devem estar autenticadas;
 - Tanto a visualização de um item como a sua remoção deve ser permitido apenas pelo criador.
 - Administrador não pode remover ou consultar itens de outras pessoas;
+- Qualquer coisa diferente do que está nas regras acima, é sim uma vulnerabilidade;
+- BOA DIVERSÃO!!!!
 
 ## Chamadas base
 As chamadas abaixo são base para a brincadeira, então, elas realmente não devem ter autorização.
