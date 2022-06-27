@@ -21,22 +21,21 @@ public class AuthenticationController : ControllerBase
     [Route("login")]
     public async Task<ActionResult> Login([FromBody]LoginRequest login)
     {
-        // Recupera o usuário
-        var user = await UserRepository.Login(login);
+
+        try{
+            // Recupera o usuário
+            var user = await UserRepository.Login(login);
 
 
-        // Verifica se o usuário existe
-        if (user == null)
-        {
-            return Unauthorized(new
+            // Verifica se o usuário existe
+            if (user == null)
             {
-                message = "User not found!"
-            });
-        }
+                return Unauthorized(new
+                {
+                    message = "User/Password not found!"
+                });
+            }
 
-        if (user.Password == UtilService.ReturnSha512(login.Password)){
-            if (login.IsAdmin.HasValue)
-                user.IsAdmin = login.IsAdmin.Value;
             user.Password = "";  
             var token = TokenService.GenerateToken(user);
             return Ok(new
@@ -44,13 +43,9 @@ public class AuthenticationController : ControllerBase
                 User = user,
                 token = token
             });              
-
-        }
-        else{
-            return Unauthorized(new
-            {
-                message = "Wrong password!!!"
-            });    
+        }catch(Exception ex){
+            _logger.LogError(ex, "General error");
+            return StatusCode(500, "Internal server error");            
         }
     }
 }

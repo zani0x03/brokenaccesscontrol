@@ -19,7 +19,9 @@ public class ToDoItemController : ControllerBase
         _logger = logger;
     }   
 
+
     // GET: api/ToDoItem
+    [Authorize(Roles = "admin")]
     [HttpGet]
     public async Task<IEnumerable<TodoItem>> GetToDoItems()
     {
@@ -48,11 +50,12 @@ public class ToDoItemController : ControllerBase
         }        
     }
 
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<ActionResult> GetToDoItem(int id)
     {
         try{
-            var todoItem = await TodoItemRepository.GetToDoItem(id);
+            var todoItem = await TodoItemRepository.GetToDoItem(id,((ClaimsIdentity)User.Identity).FindFirst("UserId").Value);
 
             if (todoItem != null)
                 return Ok(new
@@ -75,7 +78,7 @@ public class ToDoItemController : ControllerBase
     public async Task<ActionResult> Delete(int id)
     {
         try{
-            var ret = await TodoItemRepository.Delete(id);
+            var ret = await TodoItemRepository.Delete(id, ((ClaimsIdentity)User.Identity).FindFirst("UserId").Value);
 
             if (ret)
                 return Ok(new

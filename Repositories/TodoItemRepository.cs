@@ -16,23 +16,25 @@ public static class TodoItemRepository
         return lstTodoItens;
     }
 
-    public static async Task<TodoItem> GetToDoItem(int id)
+    public static async Task<TodoItem> GetToDoItem(int id, string userId)
     {
         var conn = SqliteConfigConnection.GetSQLiteConnection();
-        string query = "Select id, name, description, userId from todoitems where id = @id";
+        string query = "Select id, name, description, userId from todoitems where id = @id and userId = @userId";
         var todoItem = await conn.QueryAsync<TodoItem>(query, new{
-            id = id
+            id = id,
+            userId = userId
         });
         return todoItem.FirstOrDefault();
     }    
 
 
-    public static async Task<bool> Delete(int id){
+    public static async Task<bool> Delete(int id, string userId){
 
         var conn = SqliteConfigConnection.GetSQLiteConnection(); 
-        var query = "delete from todoitems where id = @id";
+        var query = "delete from todoitems where id = @id and userId = @userId";
         var table = await conn.ExecuteAsync(query, new{
-            id = id
+            id = id,
+            userId = userId
         });        
 
         return table > 0 ? true : false;        

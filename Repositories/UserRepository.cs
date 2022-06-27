@@ -13,7 +13,7 @@ public static class UserRepository
                 User = new Models.User{
                 Id = Guid.NewGuid().ToString(),
                 DateInsert = DateTime.UtcNow,
-                IsAdmin = userRequest.IsAdmin.HasValue ? userRequest.IsAdmin.Value : false,
+                IsAdmin = false,
                 Login = userRequest.Login,
                 Name = userRequest.Name,
                 Password = UtilService.ReturnSha512(userRequest.Password)             
@@ -47,9 +47,10 @@ public static class UserRepository
     public static async Task<User> Login(LoginRequest login)
     {
         var conn = SqliteConfigConnection.GetSQLiteConnection();
-        string query = "Select id, name, login, password, dateInsert, dateUpdate, isAdmin from users where login = @login";
+        string query = "Select id, name, login, password, dateInsert, dateUpdate, isAdmin from users where login = @login and password = @password";
         var user = await conn.QueryAsync<User>(query, new{
-            @login = login.Login
+            @login = login.Login,
+            @password = UtilService.ReturnSha512(login.Password)
         });
         return user.FirstOrDefault();
     }  
