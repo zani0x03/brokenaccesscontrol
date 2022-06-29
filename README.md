@@ -1,5 +1,9 @@
 # Broken Access Control API
 
+#Rodar em Docker - criar imagem
+docker build --pull --rm --no-cache -f "Dockerfile" -t brokenaccesscontrol:latest "."
+#Rodar em Docker - executar container
+docker run -e JWTSecret=fedaf7d8863b48e197b9287d492b708e -e SqliteDatabase=brokenaccesscontrol.db -p 5127:80 brokenaccesscontrol:latest
 
 # Configuração
 Dentro da pasta Properties tem um arquivo launchSettings.json, nele precisa alterar o caminho do banco de dados "SqliteDatabase" para o endereço da sua máquina, o banco de dados SQLite está no arquivo dentro da pasta Database.
