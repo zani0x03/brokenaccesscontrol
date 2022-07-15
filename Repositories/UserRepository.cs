@@ -35,6 +35,16 @@ public static class UserRepository
         return userResponse;        
     }
 
+    public static async Task RecoveryPassword(PasswordRecovery recovery){
+        var conn = SqliteConfigConnection.GetSQLiteConnection(); 
+        var query = "update users set inativo=@inativo, dateChangePassword=@dateChangePassword where login=@login";
+        var table = await conn.ExecuteAsync(query, new{
+            inativo = 1,
+            dateChangePassword = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            login = recovery.Login
+        });          
+    }    
+
     public static async Task<IEnumerable<User>> GetAllUsers()
     {
             var conn = SqliteConfigConnection.GetSQLiteConnection();
