@@ -35,10 +35,20 @@ public static class UserRepository
         return userResponse;        
     }
 
+    public static async Task RecoveryPassword(PasswordRecovery recovery){
+        var conn = SqliteConfigConnection.GetSQLiteConnection(); 
+        var query = "update users set inativo=@inativo, dateChangePassword=@dateChangePassword where login=@login";
+        var table = await conn.ExecuteAsync(query, new{
+            inativo = 1,
+            dateChangePassword = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            login = recovery.Login
+        });          
+    }    
+
     public static async Task<IEnumerable<User>> GetAllUsers()
     {
             var conn = SqliteConfigConnection.GetSQLiteConnection();
-            string query = "Select id, name, login, password, dateInsert, dateUpdate, isAdmin from users";
+            string query = "Select id, name, login, password, dateInsert, dateUpdate, isAdmin, inativo, dateChangePassword from users";
             var lstUsers = await conn.QueryAsync<User>(query);
             return lstUsers;
     }       
@@ -47,7 +57,7 @@ public static class UserRepository
     public static async Task<User> Login(LoginRequest login)
     {
         var conn = SqliteConfigConnection.GetSQLiteConnection();
-        string query = "Select id, name, login, password, dateInsert, dateUpdate, isAdmin from users where login = @login and password = @password";
+        string query = "Select id, name, login, password, dateInsert, dateUpdate, isAdmin, inativo, dateChangePassword from users where login = @login and inativo = 0";
         var user = await conn.QueryAsync<User>(query, new{
             @login = login.Login,
             @password = UtilService.ReturnSha512(login.Password)

@@ -48,11 +48,11 @@ public class UserController : ControllerBase
 
     [HttpPost]
     [Route("passwordrecovery")]
-    public async Task<ActionResult> PasswordRecovery([FromBody]PasswordRecovery email){
+    public async Task<ActionResult> PasswordRecovery([FromBody]PasswordRecovery recovery){
         try{
             return Ok(new
             {
-                message = "Caso seu e-mail exista em nossa base de dados você receberá um e-mail com as instruções."
+                message = "Caso seu login exista em nossa base de dados você receberá um e-mail com as instruções."
             });    
         }catch(Exception ex){
             _logger.LogError(ex, "General error");

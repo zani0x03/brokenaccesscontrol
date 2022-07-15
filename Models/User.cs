@@ -9,6 +9,8 @@ public class User
     public DateTime DateInsert { get; set; }
     public DateTime? DateUpdate { get; set; }
     public bool IsAdmin { get; set; }
+    public bool Inativo { get; set; }
+    public DateTime? dateChangePassword { get; set; }
 }
 
  
