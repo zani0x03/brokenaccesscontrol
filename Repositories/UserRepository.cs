@@ -38,7 +38,7 @@ public static class UserRepository
     public static async Task<IEnumerable<User>> GetAllUsers()
     {
             var conn = SqliteConfigConnection.GetSQLiteConnection();
-            string query = "Select id, name, login, password, dateInsert, dateUpdate, isAdmin from users";
+            string query = "Select id, name, login, password, dateInsert, dateUpdate, isAdmin, inativo, dateChangePassword from users";
             var lstUsers = await conn.QueryAsync<User>(query);
             return lstUsers;
     }       
@@ -47,7 +47,7 @@ public static class UserRepository
     public static async Task<User> Login(LoginRequest login)
     {
         var conn = SqliteConfigConnection.GetSQLiteConnection();
-        string query = "Select id, name, login, password, dateInsert, dateUpdate, isAdmin from users where login = @login";
+        string query = "Select id, name, login, password, dateInsert, dateUpdate, isAdmin, inativo, dateChangePassword from users where login = @login and inativo = 0";
         var user = await conn.QueryAsync<User>(query, new{
             @login = login.Login
         });
