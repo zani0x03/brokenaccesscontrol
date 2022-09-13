@@ -53,4 +53,31 @@ public class AuthenticationController : ControllerBase
             });    
         }
     }
+
+    [HttpPost]
+    [Route("loginsql")]
+    public async Task<ActionResult> LoginSQL([FromBody]LoginRequest login)
+    {
+        // Recupera o usuário
+        var user = await UserRepository.LoginSQL(login);
+
+
+        // Verifica se o usuário existe
+        if (user == null)
+        {
+            return Unauthorized(new
+            {
+                message = "User not found!"
+            });
+        }else{
+            user.Password = "";  
+            var token = TokenService.GenerateToken(user);
+            return Ok(new
+            {
+                User = user,
+                token = token
+            });              
+        }
+    }
+
 }
