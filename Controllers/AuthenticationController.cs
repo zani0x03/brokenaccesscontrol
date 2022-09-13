@@ -32,7 +32,7 @@ public class AuthenticationController : ControllerBase
             {
                 return Unauthorized(new
                 {
-                    message = "User/Password not found!"
+                    message = "User/Password wrong!!"
                 });
             }
 
@@ -62,7 +62,7 @@ public class AuthenticationController : ControllerBase
         {
             return Unauthorized(new
             {
-                message = "User not found!"
+                message = "User/Password wrong!!"
             });
         }else{
             user.Password = "";  

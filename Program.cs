@@ -29,7 +29,14 @@ builder.Services.Configure<IpRateLimitOptions>(options =>
                 Endpoint = "POST:/api/User/passwordrecovery",
                 Period = "60s",
                 Limit = 2
+            },
+            new RateLimitRule
+            {
+                Endpoint = "POST:/api/authentication/login",
+                Period = "60s",
+                Limit = 2
             }
+
         };
 });
 
