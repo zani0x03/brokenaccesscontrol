@@ -46,6 +46,23 @@ public class UserController : ControllerBase
 
     }    
 
+    [HttpPost]
+    [Route("passwordrecovery")]
+    public async Task<ActionResult> PasswordRecovery([FromBody]PasswordRecovery recovery){
+        try{
+            
+            await UserRepository.RecoveryPassword(recovery);
+
+            return Ok(new
+            {
+                message = "Caso seu login exista em nossa base de dados você receberá um e-mail com as instruções."
+            });    
+        }catch(Exception ex){
+            _logger.LogError(ex, "General error");
+            return StatusCode(500, "Internal server error");     
+        }
+    }     
+
     [HttpGet]
     public async Task<IEnumerable<User>> GetAllUsers()
     {
